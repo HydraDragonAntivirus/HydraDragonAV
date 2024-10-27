@@ -9,7 +9,7 @@
 
 ##  Documentation && Installation && FAQ
 
-Read [docs](docs/html/index.html) here.
+Read [docs](https://github.com/HydraDragonAntivirus/HydraDragonAV/wiki) here.
 
 ## Discord Community Server
 
