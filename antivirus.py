@@ -98,14 +98,6 @@ from watchdog.events import FileSystemEventHandler
 print(f"watchdog.events.FileSystemEventHandler module loaded in {time.time() - start_time:.6f} seconds")
 
 start_time = time.time()
-import win32file
-print(f"win32file module loaded in {time.time() - start_time:.6f} seconds")
-
-start_time = time.time()
-import win32con
-print(f"win32con module loaded in {time.time() - start_time:.6f} seconds")
-
-start_time = time.time()
 from datetime import datetime, timedelta
 print(f"datetime.datetime and timedelta modules loaded in {time.time() - start_time:.6f} seconds")
 
@@ -1707,14 +1699,6 @@ uefi_paths = [
 ]
 snort_command = ["C:\\Snort\\bin\\snort.exe"] + device_args + ["-c", snort_config_path, "-A", "fast"]
 
-# Custom flags for directory changes
-FILE_NOTIFY_CHANGE_LAST_ACCESS = 0x00000020
-FILE_NOTIFY_CHANGE_CREATION = 0x00000040
-FILE_NOTIFY_CHANGE_EA = 0x00000080
-FILE_NOTIFY_CHANGE_STREAM_NAME = 0x00000200
-FILE_NOTIFY_CHANGE_STREAM_SIZE = 0x00000400
-FILE_NOTIFY_CHANGE_STREAM_WRITE = 0x00000800
-
 fake_system_files = [
     'svchost.exe',
     'rundll32.exe',
@@ -2988,61 +2972,6 @@ def scan_and_warn(file_path, flag=False):
         logging.error(f"Error scanning file {file_path}: {e}")
         return False
 
-def monitor_sandbox():
-    if not os.path.exists(sandboxie_folder):
-        print(f"The sandboxie folder path does not exist: {sandboxie_folder}")
-        logging.error(f"The sandboxie folder path does not exist: {sandboxie_folder}")
-        return
-
-    hDir = win32file.CreateFile(
-        sandboxie_folder,
-        1,
-        win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE | win32con.FILE_SHARE_DELETE,
-        None,
-        win32con.OPEN_EXISTING,
-        win32con.FILE_FLAG_BACKUP_SEMANTICS,
-        None
-    )
-
-    try:
-        while True:
-            results = win32file.ReadDirectoryChangesW(
-                hDir,
-                1024,
-                True,
-                win32con.FILE_NOTIFY_CHANGE_FILE_NAME |
-                win32con.FILE_NOTIFY_CHANGE_DIR_NAME |
-                win32con.FILE_NOTIFY_CHANGE_ATTRIBUTES |
-                win32con.FILE_NOTIFY_CHANGE_SIZE |
-                win32con.FILE_NOTIFY_CHANGE_LAST_WRITE |
-                win32con.FILE_NOTIFY_CHANGE_SECURITY |
-                FILE_NOTIFY_CHANGE_LAST_ACCESS |
-                FILE_NOTIFY_CHANGE_CREATION |
-                FILE_NOTIFY_CHANGE_EA |
-                FILE_NOTIFY_CHANGE_STREAM_NAME |
-                FILE_NOTIFY_CHANGE_STREAM_SIZE |
-                FILE_NOTIFY_CHANGE_STREAM_WRITE,
-                None,
-                None
-            )
-            for action, file in results:
-                pathToScan = os.path.join(sandboxie_folder, file)
-                if os.path.exists(pathToScan):
-                    print(pathToScan)
-                    scan_and_warn(pathToScan)
-                else:
-                    print(f"File or folder not found: {pathToScan}")
-                    logging.warning(f"File or folder not found: {pathToScan}")
-
-    except Exception as e:
-        print(f"An error occurred at monitor_sandbox: {e}")
-        logging.error(f"An error occurred at monitor_sandbox: {e}")
-    finally:
-        win32file.CloseHandle(hDir)
-
-def start_monitoring_sandbox():
-    threading.Thread(target=monitor_sandbox).start()
-
 def monitor_snort_log():
     if not os.path.exists(log_path):
         open(log_path, 'w').close()  # Create an empty file if it doesn't exist
@@ -3821,7 +3750,6 @@ def perform_sandbox_analysis(file_path):
         # Start other sandbox analysis tasks in separate threads
         threading.Thread(target=observer.start).start()
         threading.Thread(target=scan_and_warn, args=(file_path,)).start()
-        threading.Thread(target=start_monitoring_sandbox).start()
         threading.Thread(target=monitor_sandboxie_directory).start()
         threading.Thread(target=check_startup_directories).start()
         threading.Thread(target=monitor_hosts_file).start()
