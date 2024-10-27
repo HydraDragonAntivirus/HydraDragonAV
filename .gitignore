@@ -1,3 +1,37 @@
+# ClamAV database files
+daily.cvd
+daily.cld
+bytecode.cvd
+main.cvd
+
+# Sanesecurity + Foxhole databases
+junk.ndb
+jurlbl.ndb
+phish.ndb
+sanesecurity.ftm
+sigwhitelist.ign2
+scam.ndb
+blurl.ndb
+foxhole_generic.cdb
+foxhole_filename.cdb
+foxhole_js.cdb
+foxhole_js.ndb
+foxhole_all.cdb
+foxhole_all.ndb
+foxhole_mail.cdb
+badmacro.ndb
+shelter.ldb
+winnow_malware_links.ndb
+winnow_phish_complete_url.ndb
+bofhland_cracked_URL.ndb
+bofhland_malware_URL.ndb
+bofhland_phishing_URL.ndb
+porcupine.ndb
+
+# Directories
+/coverage
+__pycache__/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
